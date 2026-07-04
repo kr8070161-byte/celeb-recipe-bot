@@ -43,9 +43,11 @@
     "commentText": "생크림을 휘핑하지 않고 그냥 넣으면 얼음처럼 굳어요.\n90% 정도 휘핑한 다음에 섞어야 부드러워요.\n그리고 오레오는 크림까지 같이 으깨야 더 맛있어요.",
     "scheduledAt": "2026-07-04T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "published",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": false
+    "useCoupang": false,
+    "publishedAt": "2026-07-04T12:20:20.480Z",
+    "postId": "18100530068130375"
   },
   {
     "id": "auto-cta-1-1783148714334",
