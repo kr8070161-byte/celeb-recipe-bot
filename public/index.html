@@ -1,0 +1,1922 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Threads 자동 발행 대시보드 — celeb_recipe</title>
+  <meta name="description" content="celeb_recipe Threads 자동 발행 대시보드 — 콘텐츠 보드, 예약 발행" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0d0d12;
+      --surface: #16161e;
+      --surface2: #1e1e2a;
+      --border: rgba(255,255,255,0.07);
+      --accent: #a78bfa;
+      --accent2: #818cf8;
+      --success: #34d399;
+      --danger: #f87171;
+      --warning: #fbbf24;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --gradient: linear-gradient(135deg, #a78bfa 0%, #818cf8 50%, #38bdf8 100%);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 0 0 60px;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+    }
+
+    .logo {
+      width: 40px; height: 40px;
+      background: var(--gradient);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+
+    header h1 { font-size: 1.05rem; font-weight: 700; }
+    header p { font-size: 0.73rem; color: var(--muted); margin-top: 2px; }
+
+    .header-right { margin-left: auto; display: flex; gap: 12px; align-items: center; }
+
+    .badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      background: rgba(52, 211, 153, 0.12);
+      color: var(--success);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+    }
+
+    .account-chip {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 0.8rem;
+    }
+
+    /* ── Page Nav ── */
+    .page-nav {
+      display: flex;
+      gap: 2px;
+      padding: 12px 32px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .page-tab {
+      padding: 8px 20px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .page-tab.active {
+      background: rgba(167,139,250,0.15);
+      color: var(--accent);
+    }
+
+    .page-tab:hover:not(.active) { background: var(--surface2); color: var(--text); }
+
+    /* ── Page Views ── */
+    .page-view { display: none; }
+    .page-view.active { display: block; }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 24px;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 24px;
+    }
+
+    @media (max-width: 800px) { .container { grid-template-columns: 1fr; } }
+
+    .board-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 24px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+    }
+
+    .card-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ── Goals Banner ── */
+    .goals-banner {
+      background: var(--surface);
+      border: 1px solid rgba(167,139,250,0.2);
+      border-radius: 16px;
+      padding: 22px 28px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .goals-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .goal-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .goal-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .goal-label { font-size: 0.78rem; color: var(--muted); }
+
+    .goal-divider {
+      width: 1px; height: 48px;
+      background: var(--border);
+    }
+
+    .goal-progress { flex: 1; min-width: 200px; }
+    .goal-progress-label { font-size: 0.78rem; color: var(--muted); margin-bottom: 8px; display: flex; justify-content: space-between; }
+    .goal-bar-bg { background: var(--surface2); border-radius: 6px; height: 8px; overflow: hidden; }
+    .goal-bar-fill { height: 100%; border-radius: 6px; background: var(--gradient); transition: width 1s ease; }
+
+    /* ── Board Stats ── */
+    .board-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    @media (max-width: 700px) { .board-stats { grid-template-columns: repeat(2,1fr); } }
+
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stat-label { font-size: 0.72rem; color: var(--muted); margin-top: 4px; }
+
+    /* ── Topic Section ── */
+    .topic-section {
+      margin-bottom: 32px;
+    }
+
+    .topic-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .topic-icon {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .topic-name {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .topic-desc {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .topic-count {
+      margin-left: auto;
+      font-size: 0.75rem;
+      color: var(--muted);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 4px 12px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    .posts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 700px) { .posts-grid { grid-template-columns: 1fr; } }
+
+    /* ── Post Card ── */
+    .post-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: border-color 0.2s, transform 0.2s;
+      position: relative;
+    }
+
+    .post-card:hover {
+      border-color: rgba(167,139,250,0.3);
+      transform: translateY(-2px);
+    }
+
+    .post-card.published {
+      border-color: rgba(52,211,153,0.25);
+      background: rgba(52,211,153,0.03);
+    }
+
+    .post-number {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--muted);
+      background: var(--surface2);
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .post-text {
+      font-size: 0.85rem;
+      line-height: 1.65;
+      color: var(--text);
+      white-space: pre-wrap;
+      flex: 1;
+      padding-right: 36px;
+    }
+
+    .post-footer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .post-status {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .status-draft {
+      background: rgba(100,116,139,0.12);
+      color: var(--muted);
+      border: 1px solid rgba(100,116,139,0.2);
+    }
+
+    .status-published {
+      background: rgba(52,211,153,0.12);
+      color: var(--success);
+      border: 1px solid rgba(52,211,153,0.2);
+    }
+
+    .post-char { font-size: 0.7rem; color: var(--muted); margin-left: auto; }
+
+    .btn-publish-now {
+      padding: 5px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(167,139,250,0.3);
+      background: rgba(167,139,250,0.1);
+      color: var(--accent);
+      font-family: inherit;
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-publish-now:hover {
+      background: rgba(167,139,250,0.2);
+      border-color: var(--accent);
+    }
+
+    .btn-publish-now:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-copy {
+      padding: 5px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.74rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-copy:hover { background: var(--surface2); color: var(--text); }
+
+    /* ── Publish view elements ── */
+    textarea {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      padding: 16px;
+      resize: vertical;
+      min-height: 140px;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    textarea:focus { border-color: var(--accent); }
+    textarea::placeholder { color: var(--muted); }
+
+    .char-count {
+      text-align: right;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .char-count.over { color: var(--danger); }
+
+    input[type="text"], input[type="datetime-local"] {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.88rem;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      color-scheme: dark;
+    }
+
+    input[type="text"]:focus,
+    input[type="datetime-local"]:focus { border-color: var(--accent); }
+
+    input::placeholder { color: var(--muted); }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 8px;
+      margin-top: 16px;
+    }
+
+    .toggle-row {
+      display: flex;
+      gap: 0;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 16px;
+    }
+
+    .toggle-btn {
+      flex: 1;
+      padding: 9px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .toggle-btn.active {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 12px rgba(167, 139, 250, 0.4);
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border-radius: 10px;
+      border: none;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--gradient);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(167, 139, 250, 0.35);
+    }
+
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(167, 139, 250, 0.5); }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-danger {
+      background: rgba(248, 113, 113, 0.12);
+      color: var(--danger);
+      border: 1px solid rgba(248, 113, 113, 0.2);
+      padding: 6px 12px;
+      font-size: 0.78rem;
+    }
+
+    .btn-danger:hover { background: rgba(248, 113, 113, 0.2); }
+    .btn-full { width: 100%; justify-content: center; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+    .schedule-section { display: none; animation: fadeIn 0.2s ease; }
+    .schedule-section.show { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .dash-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .list-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      animation: slideIn 0.25s ease;
+    }
+
+    .list-item-icon {
+      width: 34px; height: 34px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .icon-pending { background: rgba(251,191,36,0.15); }
+    .icon-published { background: rgba(52,211,153,0.15); }
+    .icon-instant { background: rgba(167,139,250,0.15); }
+
+    .list-item-body { flex: 1; min-width: 0; }
+
+    .list-item-text {
+      font-size: 0.85rem;
+      line-height: 1.5;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .list-item-meta {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 4px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; }
+    .dot-pending { background: var(--warning); }
+    .dot-published { background: var(--success); }
+
+    .empty { text-align: center; color: var(--muted); font-size: 0.85rem; padding: 32px 0; }
+
+    #toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 24px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #toast.show { transform: translateX(-50%) translateY(0); }
+    #toast.success { border-color: rgba(52,211,153,0.4); }
+    #toast.error { border-color: rgba(248,113,113,0.4); }
+
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 500;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* 실시간 추천 목록 스타일 */
+    .trend-card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .trend-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .trend-item-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .trend-item-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .trend-item-meta {
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+    .trend-badge {
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(167, 139, 250, 0.15);
+      color: var(--accent);
+      font-size: 0.65rem;
+      font-weight: 600;
+      display: inline-block;
+      margin-bottom: 4px;
+      width: fit-content;
+    }
+    .btn-apply-trend {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(167, 139, 250, 0.3);
+      background: rgba(167, 139, 250, 0.1);
+      color: var(--accent);
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-apply-trend:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header>
+  <div class="logo">🧵</div>
+  <div>
+    <h1>Threads 발행 대시보드</h1>
+    <p>@celeb_recipe.official</p>
+  </div>
+  <div class="header-right">
+    <span class="badge" id="status-badge">● 연결 중...</span>
+    <div class="account-chip" id="account-chip">계정 로딩 중...</div>
+  </div>
+</header>
+
+<!-- ── Page Navigation ── -->
+<nav class="page-nav">
+  <button class="page-tab active" id="nav-publish" onclick="switchPage('publish')">⚡ 발행하기</button>
+  <button class="page-tab" id="nav-board" onclick="switchPage('board')">📋 콘텐츠 보드</button>
+</nav>
+
+<!-- ══════════════════════════════════════
+     PAGE 1: 발행하기
+══════════════════════════════════════ -->
+<div id="page-publish" class="page-view active">
+  <div class="container">
+
+    <!-- 왼쪽 -->
+    <div>
+      <!-- 통계 -->
+      <div class="dash-stats">
+        <div class="stat">
+          <div class="stat-value" id="stat-total">–</div>
+          <div class="stat-label">전체 발행</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="stat-today">–</div>
+          <div class="stat-label">오늘 발행</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="stat-queue">–</div>
+          <div class="stat-label">예약 대기</div>
+        </div>
+      </div>
+
+      <!-- 작성 카드 -->
+      <div class="card" style="margin-bottom:24px">
+        <div class="card-title">✏️ 게시물 작성</div>
+        <div class="toggle-row">
+          <button class="toggle-btn active" id="btn-instant" onclick="setMode('instant')">⚡ 즉시 발행</button>
+          <button class="toggle-btn" id="btn-schedule" onclick="setMode('schedule')">🕒 예약 발행</button>
+        </div>
+        
+        <label>본문 내용</label>
+        <textarea id="post-text" placeholder="Threads에 올릴 내용을 입력하세요..." oninput="updateCharCount(this)"></textarea>
+        <div class="char-count" id="char-count">0 / 500</div>
+
+        <label>💬 댓글에 숨길 비법 (자동 연쇄 발행)</label>
+        <textarea id="post-comment" style="min-height:90px" placeholder="본문 발행 5초 후 자동으로 올라갈 첫 댓글 내용을 입력하세요..."></textarea>
+        
+        <label>이미지 URL <span style="color:var(--muted);font-weight:400">(선택)</span></label>
+        <input type="text" id="image-url" placeholder="https://example.com/image.jpg" />
+        <div class="schedule-section" id="schedule-section">
+          <label>발행 예약 시간</label>
+          <input type="datetime-local" id="scheduled-at" />
+        </div>
+        <div style="margin-top:20px">
+          <button class="btn btn-primary btn-full" id="publish-btn" onclick="handlePublish()">
+            <div class="spinner" id="publish-spinner"></div>
+            <span id="publish-label">⚡ 즉시 발행</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 이력/큐 탭 -->
+      <div class="card">
+        <div class="tabs">
+          <button class="tab active" id="tab-history" onclick="switchTab('history')">📋 발행 이력</button>
+          <button class="tab" id="tab-queue" onclick="switchTab('queue')">🕒 예약 큐</button>
+        </div>
+        <div id="panel-history" class="tab-panel active">
+          <div id="history-list"><div class="empty">발행 이력이 없습니다</div></div>
+        </div>
+        <div id="panel-queue" class="tab-panel">
+          <div id="queue-list"><div class="empty">예약된 게시물이 없습니다</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 오른쪽 -->
+    <div>
+      <!-- 실시간 트렌드 소스 카드 -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-title">🔥 요즘 실시간 인기 레시피 소스</div>
+        <div class="trend-card-list">
+          <div class="trend-item">
+            <div class="trend-item-info">
+              <span class="trend-badge">조회수 12만🔥</span>
+              <span class="trend-item-title">닝닝 해장 해물라면 레시피</span>
+              <span class="trend-item-meta">중국식 고추기름 볶음 방식</span>
+            </div>
+            <button class="btn-apply-trend" onclick="applyTrend('ningning')">가져오기</button>
+          </div>
+          <div class="trend-item">
+            <div class="trend-item-info">
+              <span class="trend-badge">리포스트 8천회💬</span>
+              <span class="trend-item-title">장원영 오트밀 요구르트 볼</span>
+              <span class="trend-item-meta">아침 다이어트 초간단 3분 버프</span>
+            </div>
+            <button class="btn-apply-trend" onclick="applyTrend('wonyoung')">가져오기</button>
+          </div>
+          <div class="trend-item">
+            <div class="trend-item-info">
+              <span class="trend-badge">실시간 급상승📈</span>
+              <span class="trend-item-title">신세경 들기름 메밀국수 비법</span>
+              <span class="trend-item-meta">쯔유 1T와 들기름 조합 비율</span>
+            </div>
+            <button class="btn-apply-trend" onclick="applyTrend('sekyung')">가져오기</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">👤 계정 정보</div>
+        <div id="account-info"><div class="empty">로딩 중...</div></div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <div class="card-title">📊 발행 한도</div>
+        <div id="limit-info"><div class="empty">로딩 중...</div></div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <div class="card-title">🎯 목표</div>
+        <div style="font-size:0.85rem;line-height:2">
+          <div>📌 <strong>1개월</strong> — 누적 조회수 <span style="color:var(--accent);font-weight:700">5만</span></div>
+          <div>📌 <strong>3개월</strong> — 누적 조회수 <span style="color:var(--accent);font-weight:700">10만</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE 2: 콘텐츠 보드
+══════════════════════════════════════ -->
+<div id="page-board" class="page-view">
+  <div class="board-container">
+
+    <!-- 목표 배너 -->
+    <div class="goals-banner">
+      <div>
+        <div class="goals-title">🎯 운영 목표</div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-top:2px">@celeb_recipe.official</div>
+      </div>
+      <div class="goal-divider"></div>
+      <div class="goal-item">
+        <div class="goal-value">5만</div>
+        <div class="goal-label">📌 1개월 누적 조회수</div>
+      </div>
+      <div class="goal-divider"></div>
+      <div class="goal-item">
+        <div class="goal-value">10만</div>
+        <div class="goal-label">📌 3개월 누적 조회수</div>
+      </div>
+      <div class="goal-divider"></div>
+      <div class="goal-progress">
+        <div class="goal-progress-label">
+          <span>1개월 달성률</span>
+          <span id="progress-pct">0%</span>
+        </div>
+        <div class="goal-bar-bg">
+          <div class="goal-bar-fill" id="progress-bar" style="width:0%"></div>
+        </div>
+        <div style="font-size:0.73rem;color:var(--muted);margin-top:6px">발행한 게시물이 많을수록 가까워져요 🚀</div>
+      </div>
+    </div>
+
+    <!-- 보드 통계 -->
+    <div class="board-stats">
+      <div class="stat">
+        <div class="stat-value">7</div>
+        <div class="stat-label">전체 주제</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">28</div>
+        <div class="stat-label">준비된 게시물</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="board-published">0</div>
+        <div class="stat-label">발행 완료</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="board-remaining">28</div>
+        <div class="stat-label">발행 대기</div>
+      </div>
+    </div>
+
+    <!-- ── 주제 1 ── -->
+    <div class="topic-section">
+      <div class="topic-header">
+        <div class="topic-icon" style="background:rgba(251,191,36,0.15)">⭐</div>
+        <div>
+          <div class="topic-name">주제 1. 셀럽 따라 먹기</div>
+          <div class="topic-desc">유명인의 식단·음식을 따라 만드는 레시피 콘텐츠</div>
+        </div>
+        <div class="topic-count" id="count-t1">0 / 4 발행</div>
+      </div>
+      <div class="posts-grid">
+        <div class="post-card" id="pc-1-1">
+          <div class="post-number">#1-1</div>
+          <div class="post-text">제니가 즐겨먹는 아침은 단 2가지 🌿
+
+아보카도 토스트 + 그린 스무디
+
+시금치 한 줌 + 바나나 1/2개
+아몬드 밀크 200ml → 30초 갈면 끝
+
+열량은 낮고 포만감은 최고✨
+오늘부터 제니 아침 루틴 따라해봐요</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-1-1">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('1-1')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('1-1')">발행</button>
+            <span class="post-char" id="cc-1-1"></span>
+          </div>
+        </div>
+        <div class="post-card" id="pc-1-2">
+          <div class="post-number">#1-2</div>
+          <div class="post-text">아이유 다이어트 비법 식단 공개 🥗
+
+핵심은 '저녁 탄수화물 끊기'
+대신 단백질 폭탄으로 채우기
+
+닭가슴살 + 삶은 달걀 + 방울토마토
+소스는 올리브오일 + 레몬즙만!
+
+2주 따라했더니 진짜 달라졌어요 🔥</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-1-2">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('1-2')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('1-2')">발행</button>
+            <span class="post-char" id="cc-1-2"></span>
+          </div>
+        </div>
+        <div class="post-card" id="pc-1-3">
+          <div class="post-number">#1-3</div>
+          <div class="post-text">블랙핑크 리사의 태국식 점심 🍛
+
+팟타이를 집에서 만드는 법
+
+쌀국수면 + 숙주 + 달걀 + 새우
+피쉬소스 2T + 굴소스 1T + 설탕 1t
+
+팬에 센불로 3분! 고수 올리면 완성🌿
+요즘 제일 자주 해먹는 레시피예요</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-1-3">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('1-3')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('1-3')">발행</button>
+            <span class="post-char" id="cc-1-3"></span>
+          </div>
+        </div>
+        <div class="post-card" id="pc-1-4">
+          <div class="post-number">#1-4</div>
+          <div class="post-text">손예진이 즐겨먹는 피부 미용식 🫐
+
+안티에이징 슈퍼푸드 볼
+
+블루베리 + 아사이 + 치아씨드
+그릭요거트 위에 얹고
+꿀 한 방울 🍯
+
+5분도 안 걸리는데 피부가 달라지는 게 느껴져요✨</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-1-4">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('1-4')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('1-4')">발행</button>
+            <span class="post-char" id="cc-1-4"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 주제 2 ── -->
+    <div class="topic-section">
+      <div class="topic-header">
+        <div class="topic-icon" style="background:rgba(251,146,60,0.15)">⏱️</div>
+        <div>
+          <div class="topic-name">주제 2. 5분 완성 브런치</div>
+          <div class="topic-desc">바쁜 아침에도 셀럽 스타일 브런치를 5분 만에</div>
+        </div>
+        <div class="topic-count" id="count-t2">0 / 4 발행</div>
+      </div>
+      <div class="posts-grid">
+        <div class="post-card" id="pc-2-1">
+          <div class="post-number">#2-1</div>
+          <div class="post-text">바쁜 아침에 5분 완성 에그 토스트 🍳
+
+프렌치 스타일 딱 한 가지만
+
+식빵 1장 + 달걀 1개 + 버터
+달걀 풀어 식빵 적시고
+버터 팬에 앞뒤 1분씩 구워서
+메이플시럽 뿌리면 끝☕
+
+카페 브런치 부럽지 않아요</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-2-1">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('2-1')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('2-1')">발행</button>
+            <span class="post-char" id="cc-2-1"></span>
+          </div>
+        </div>
+        <div class="post-card" id="pc-2-2">
+          <div class="post-number">#2-2</div>
+          <div class="post-text">인스타 감성 아보카도 에그 토스트 🥑
+
+만드는 법이 너무 간단해서 놀랐어요
+
+식빵 굽기 → 아보카도 으깨기
+달걀 후라이 올리기 → 소금+후추
+레몬즙 몇 방울이 맛의 포인트!
+
+이것만 먹어도 포만감 최고예요 🌟</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-2-2">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('2-2')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('2-2')">발행</button>
+            <span class="post-char" id="cc-2-2"></span>
+          </div>
+        </div>
+        <div class="post-card" id="pc-2-3">
+          <div class="post-number">#2-3</div>
+          <div class="post-text">그릭요거트 파르페 2분 완성 🫐
+
+운동 후 단백질 보충에 딱!
+
+그릭요거트 + 그래놀라
+블루베리 + 바나나 + 꿀
+유리컵에 예쁘게 층층이 쌓기
+
+사진 먼저 찍고 먹어요📸
+이 조합이 제일 맛있더라고요</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-2-3">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('2-3')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('2-3')">발행</button>
+            <span class="post-char" id="cc-2-3"></span>
+          </div>
+        </div>
+        <div class="post-card" id="pc-2-4">
+          <div class="post-number">#2-4</div>
+          <div class="post-text">호텔식 클럽 샌드위치 5분 버전 🥪
+
+특급 호텔 브런치를 집에서
+
+식빵 3장 + 햄 + 치즈 + 달걀 + 상추
+마요네즈 + 디종 머스타드 섞어서 바르고
+쌓아 올리고 이쑤시개로 고정
+
+브런치 카페 굳이 안 가도 돼요✨</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-2-4">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('2-4')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('2-4')">발행</button>
+            <span class="post-char" id="cc-2-4"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 주제 3 ── -->
+    <div class="topic-section">
+      <div class="topic-header">
+        <div class="topic-icon" style="background:rgba(34,211,153,0.15)">🍽️</div>
+        <div>
+          <div class="topic-name">주제 3. 셀럽 단골 맛집 홈쿡</div>
+          <div class="topic-desc">연예인이 자주 찾는 레스토랑 메뉴를 집에서 재현</div>
+        </div>
+        <div class="topic-count" id="count-t3">0 / 4 발행</div>
+      </div>
+      <div class="posts-grid">
+        <div class="post-card" id="pc-3-1">
+          <div class="post-number">#3-1</div>
+          <div class="post-text">광장시장 육회비빔밥 집에서 만들기 🥩
+
+연예인들이 줄 서서 먹는 그 맛
+
+육회: 소고기 우둔살 + 배 + 참기름 + 간장
+밥 위에 나물 쌓고 육회 얹고
+달걀노른자 올려서 고추장에 비비기
+
+주말 점심으로 진짜 강추해요!</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-3-1">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('3-1')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('3-1')">발행</button>
+            <span class="post-char" id="cc-3-1"></span>
+          </div>
+        </div>
+        <div class="post-card" id="pc-3-2">
+          <div class="post-number">#3-2</div>
+          <div class="post-text">연예인들이 줄 서는 크림파스타 레시피 🍝
+
+비법은 딱 하나, 면수!
+
+생크림 + 파마산 + 베이컨 + 마늘 볶기
+면수 한 국자 넣으면 소스가 살아나요
+치즈는 반드시 불 끄고 마지막에
+
+식당 안 가도 됩니다😊</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-3-2">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('3-2')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('3-2')">발행</button>
+            <span class="post-char" id="cc-3-2"></span>
+          </div>
+        </div>
+        <div class="post-card" id="pc-3-3">
+          <div class="post-number">#3-3</div>
+          <div class="post-text">한남동 유명 버거집 패티 비법 🍔
+
+셰프한테 물어봤더니 알려줬어요
+
+소고기+돼지고기 7:3 비율 섞기
+소금+후추만! 반죽 절대 금지
+두께 2cm 패티를 센불에 앞뒤 2분
+
+특제 소스: 마요+케첩+피클즙
+이 조합이면 집버거도 맛집이에요 🔥</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-3-3">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('3-3')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('3-3')">발행</button>
+            <span class="post-char" id="cc-3-3"></span>
+          </div>
+        </div>
+        <div class="post-card" id="pc-3-4">
+          <div class="post-number">#3-4</div>
+          <div class="post-text">유명 셰프 식당의 된장찌개 비법 🍲
+
+연예인도 반한 그 맛의 정체
+
+재래식된장 + 일본된장 1:1 블렌딩
+멸치다시마 육수가 진짜 핵심!
+두부는 마지막 5분 전에 넣기
+
+집에서 이렇게 하면 진짜 식당 맛 나요✨</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-3-4">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('3-4')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('3-4')">발행</button>
+            <span class="post-char" id="cc-3-4"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 주제 4 ── -->
+    <div class="topic-section">
+      <div class="topic-header">
+        <div class="topic-icon" style="background:rgba(56,189,248,0.15)">💪</div>
+        <div>
+          <div class="topic-name">주제 4. 다이어트 성공 레시피</div>
+          <div class="topic-desc">맛도 포기 없이 칼로리를 줄이는 현실 다이어트 레시피</div>
+        </div>
+        <div class="topic-count" id="count-t4">0 / 4 발행</div>
+      </div>
+      <div class="posts-grid">
+        <div class="post-card" id="pc-4-1">
+          <div class="post-number">#4-1</div>
+          <div class="post-text">여름 다이어트 샐러드 베스트 3 🥗
+
+어떤 게 제일 맛있을까요?
+
+1️⃣ 닭가슴살+아보카도 샐러드
+2️⃣ 연어+루콜라 샐러드
+3️⃣ 새우+망고 샐러드
+
+소스: 올리브오일+레몬+소금만
+댓글로 어떤 게 좋은지 알려줘요!</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-4-1">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('4-1')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('4-1')">발행</button>
+            <span class="post-char" id="cc-4-1"></span>
+          </div>
+        </div>
+        <div class="post-card" id="pc-4-2">
+          <div class="post-number">#4-2</div>
+          <div class="post-text">저탄고지 저녁 메뉴 추천 🍖
+
+탄수화물 없이도 배부른 법
+
+삼겹살 200g + 상추 + 청양고추
+쌈장 대신 소금+참기름에 찍기
+된장국은 밥 없이 국물만 마시기
+
+일주일 해봤더니 3kg 빠졌어요
+진짜입니다 🔥</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-4-2">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('4-2')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('4-2')">발행</button>
+            <span class="post-char" id="cc-4-2"></span>
+          </div>
+        </div>
+        <div class="post-card" id="pc-4-3">
+          <div class="post-number">#4-3</div>
+          <div class="post-text">다이어트 중에도 먹는 떡볶이 🌶️
+
+칼로리 반으로 줄이는 방법
+
+떡 → 곤약떡으로 교체
+어묵 → 새우+오징어로 교체
+소스: 고추장 1/2 + 토마토소스 1/2
+
+칼로리 60% 절감!
+근데 맛은 거의 그대로예요😊</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-4-3">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('4-3')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('4-3')">발행</button>
+            <span class="post-char" id="cc-4-3"></span>
+          </div>
+        </div>
+        <div class="post-card" id="pc-4-4">
+          <div class="post-number">#4-4</div>
+          <div class="post-text">단백질 200g 채우는 하루 식단 💪
+
+다이어트 핵심은 단백질이에요
+
+아침: 달걀 2개 + 그릭요거트
+점심: 닭가슴살 샐러드
+저녁: 두부 스테이크 + 브로콜리
+간식: 아몬드 한 줌
+
+근육 유지하면서 지방만 빠져요✨</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-4-4">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('4-4')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('4-4')">발행</button>
+            <span class="post-char" id="cc-4-4"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 주제 5 ── -->
+    <div class="topic-section">
+      <div class="topic-header">
+        <div class="topic-icon" style="background:rgba(244,114,182,0.15)">🔥</div>
+        <div>
+          <div class="topic-name">주제 5. SNS 화제 레시피 도전</div>
+          <div class="topic-desc">틱톡·인스타 바이럴 레시피를 직접 따라해보는 콘텐츠</div>
+        </div>
+        <div class="topic-count" id="count-t5">0 / 4 발행</div>
+      </div>
+      <div class="posts-grid">
+        <div class="post-card" id="pc-5-1">
+          <div class="post-number">#5-1</div>
+          <div class="post-text">틱톡 화제의 오레오 아이스크림 🍦
+
+5분이면 완성돼요
+
+오레오 굵게 으깨기
+생크림 + 크림치즈 섞기
+오레오 믹스 → 냉동고 2시간
+
+사서 먹는 것보다 2배 맛있어요
+만들어보신 분 댓글 달아주세요!</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-5-1">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('5-1')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('5-1')">발행</button>
+            <span class="post-char" id="cc-5-1"></span>
+          </div>
+        </div>
+        <div class="post-card" id="pc-5-2">
+          <div class="post-number">#5-2</div>
+          <div class="post-text">인스타 화제 수플레 팬케이크 도전 🥞
+
+카페에서 15분 기다리는 그것
+
+달걀 흰자 머랭이 포인트!
+아주 약불 + 뚜껑 덮고 3분씩
+흔들릴 때 꺼내야 성공해요✨
+
+처음엔 저도 실패했어요😂
+몇 번 해보면 됩니다!</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-5-2">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('5-2')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('5-2')">발행</button>
+            <span class="post-char" id="cc-5-2"></span>
+          </div>
+        </div>
+        <div class="post-card" id="pc-5-3">
+          <div class="post-number">#5-3</div>
+          <div class="post-text">요즘 핫한 두바이 초콜릿 직접 만들기 🍫
+
+피스타치오 초콜릿의 정체를 밝힘
+
+카다이프 면 + 피스타치오 페이스트
+밀크초콜릿에 입히고
+냉장고에 30분만
+
+재료 구입처 궁금하면 댓글 주세요!</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-5-3">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('5-3')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('5-3')">발행</button>
+            <span class="post-char" id="cc-5-3"></span>
+          </div>
+        </div>
+        <div class="post-card" id="pc-5-4">
+          <div class="post-number">#5-4</div>
+          <div class="post-text">유튜브 1000만뷰 달걀 볶음밥 재현 🍳
+
+진짜 중국집 맛 내는 비법
+
+밥은 하루 전 냉장밥이 최고!
+버터+간장+굴소스가 비법 소스
+달걀은 반숙 상태에서 밥 투하
+센불 30초 볶아서 완성
+
+와 진짜 맛집이에요 🔥</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-5-4">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('5-4')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('5-4')">발행</button>
+            <span class="post-char" id="cc-5-4"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 주제 6 ── -->
+    <div class="topic-section">
+      <div class="topic-header">
+        <div class="topic-icon" style="background:rgba(52,211,153,0.15)">🌿</div>
+        <div>
+          <div class="topic-name">주제 6. 제철 재료 요리</div>
+          <div class="topic-desc">7월 여름 제철 재료로 만드는 계절 한정 레시피</div>
+        </div>
+        <div class="topic-count" id="count-t6">0 / 4 발행</div>
+      </div>
+      <div class="posts-grid">
+        <div class="post-card" id="pc-6-1">
+          <div class="post-number">#6-1</div>
+          <div class="post-text">7월 제철 복숭아 다 활용하기 🍑
+
+지금 아니면 못 먹는 레시피들
+
+🌟 복숭아 모히토
+🌟 복숭아 리코타 샐러드
+🌟 복숭아 아이스크림
+🌟 복숭아 청 담그기
+
+어떤 레시피 제일 궁금해요?
+댓글로 알려주면 먼저 올려드려요!</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-6-1">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('6-1')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('6-1')">발행</button>
+            <span class="post-char" id="cc-6-1"></span>
+          </div>
+        </div>
+        <div class="post-card" id="pc-6-2">
+          <div class="post-number">#6-2</div>
+          <div class="post-text">여름 수박 디저트 5가지 🍉
+
+그냥 먹기엔 아까운 수박
+
+🌟 수박 슬러시
+🌟 수박 피자 (리코타+민트)
+🌟 수박 모히토
+🌟 수박 아이스크림 바
+🌟 수박 후르츠 펀치
+
+가장 만들고 싶은 거 댓글로 알려주세요!</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-6-2">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('6-2')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('6-2')">발행</button>
+            <span class="post-char" id="cc-6-2"></span>
+          </div>
+        </div>
+        <div class="post-card" id="pc-6-3">
+          <div class="post-number">#6-3</div>
+          <div class="post-text">여름 오이로 반찬 3가지 뚝딱 🥒
+
+오이 활용도가 이렇게 높을 줄이야
+
+오이소박이 → 겉절이 대용으로 딱
+오이 냉국 → 더위 싹 가시는 맛
+오이 무침 → 5분 완성 밑반찬
+
+이 중에 뭐 제일 먹고 싶어요?</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-6-3">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('6-3')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('6-3')">발행</button>
+            <span class="post-char" id="cc-6-3"></span>
+          </div>
+        </div>
+        <div class="post-card" id="pc-6-4">
+          <div class="post-number">#6-4</div>
+          <div class="post-text">7월에 매실청 담그기 🌿
+
+한 번 담가두면 1년 내내 써요
+
+매실 1kg + 설탕 1kg
+용기에 1:1로 넣고 뚜껑 닫기
+100일 후 매실만 건져내기
+
+탄산수에 타면 최고의 여름 음료
+담가보신 분 계세요?</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-6-4">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('6-4')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('6-4')">발행</button>
+            <span class="post-char" id="cc-6-4"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 주제 7 ── -->
+    <div class="topic-section">
+      <div class="topic-header">
+        <div class="topic-icon" style="background:rgba(167,139,250,0.15)">📸</div>
+        <div>
+          <div class="topic-name">주제 7. 인스타 감성 플레이팅</div>
+          <div class="topic-desc">같은 음식도 다르게 보이게 하는 플레이팅·사진 꿀팁</div>
+        </div>
+        <div class="topic-count" id="count-t7">0 / 4 발행</div>
+      </div>
+      <div class="posts-grid">
+        <div class="post-card" id="pc-7-1">
+          <div class="post-number">#7-1</div>
+          <div class="post-text">집밥도 인스타 맛집처럼 🍽️
+
+플레이팅 3가지 법칙만 기억해요
+
+1️⃣ 홀수 개로 올리기 (3, 5, 7개)
+2️⃣ 소스는 접시 옆에 찍어서
+3️⃣ 허브 한 잎으로 마무리
+
+이것만 해도 카페 음식처럼 보여요✨</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-7-1">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('7-1')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('7-1')">발행</button>
+            <span class="post-char" id="cc-7-1"></span>
+          </div>
+        </div>
+        <div class="post-card" id="pc-7-2">
+          <div class="post-number">#7-2</div>
+          <div class="post-text">요리 사진 잘 찍는 법 📸
+
+같은 음식도 완전히 다르게 보여요
+
+✅ 자연광 활용 (창가에서 촬영)
+✅ 위에서 45도 각도가 황금 각도
+✅ 배경은 흰 접시 or 대리석
+✅ 필터는 '밝게+따뜻하게'만
+
+핸드폰으로도 충분합니다!</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-7-2">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('7-2')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('7-2')">발행</button>
+            <span class="post-char" id="cc-7-2"></span>
+          </div>
+        </div>
+        <div class="post-card" id="pc-7-3">
+          <div class="post-number">#7-3</div>
+          <div class="post-text">플레이팅 접시 어디서 살까? 🎨
+
+쇼핑 꿀팁 알려드려요
+
+💜 이케아 — 가성비 최고 흰 접시
+💜 텐바이텐 — 감성 도자기
+💜 다이소 — 놀라운 퀄리티
+💜 올리브영 — 트렌디한 소품
+
+스타일링 소품 추천 더 원하면
+댓글로 알려주세요!</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-7-3">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('7-3')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('7-3')">발행</button>
+            <span class="post-char" id="cc-7-3"></span>
+          </div>
+        </div>
+        <div class="post-card" id="pc-7-4">
+          <div class="post-number">#7-4</div>
+          <div class="post-text">음식 색감 조합 가이드 🎨
+
+인스타 고수들의 진짜 비밀
+
+빨강(토마토)+초록(바질) = 이탈리안 감성
+노랑(달걀)+보라(비트) = 비건 감성
+흰색(두부)+검정(트러플) = 고급 레스토랑 감성
+
+색 대비만 신경써도 사진이 완전히 달라요!</div>
+          <div class="post-footer">
+            <span class="post-status status-draft" id="st-7-4">● 대기</span>
+            <button class="btn-copy" onclick="copyPost('7-4')">복사</button>
+            <button class="btn-publish-now" onclick="quickPublish('7-4')">발행</button>
+            <span class="post-char" id="cc-7-4"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Toast ── -->
+<div id="toast">
+  <span id="toast-icon">✅</span>
+  <span id="toast-msg"></span>
+</div>
+
+<script>
+  /* ─── 실시간 트렌드 불러오기 ─── */
+  const trendData = {
+    ningning: {
+      text: `닝닝 해장 해물라면 끓여봤는데 대박이에요 🍜\n\n조회수 12만뷰 핫한 그 레시피.\n\n먼저 고춧가루+다진마늘 볶다가\n오징어, 새우 넣고 같이 볶기.\n물 넣고 라면스프 투하!\n\n해물 짬뽕 저리가라 할 수준이에요.\n\n여기에 마지막으로 닝닝이 꼭 넣는다는\n'비밀 재료'가 하나 더 있습니다.\n\n👉 비법은 댓글에 있어요.`,
+      comment: `마지막 10초 전에 '식초 반 스푼'을 넣어야 합니다.\n식초의 산미가 감칠맛을 폭발시키고 느끼함을 잡아줘요.\n식초 냄새는 다 날아가니 걱정 말고 넣어보세요!`
+    },
+    wonyoung: {
+      text: `장원영 아침 오트밀 볼을 3일간 먹어봤어요 🥣\n\n초간단 3분 단백질 충전식.\n\n오트밀 30g + 뜨거운 물 살짝\n불린 오트밀 위에 플레인 요거트.\n블루베리와 바나나 슬라이스 얹기.\n\n포만감이 오후까지 쭉 가요 ✨\n\n근데 이 오트밀 볼의 화룡점정을 찍는\n마지막 가루 토핑이 빠졌어요.\n\n👉 댓글에 적어뒀어요.`,
+      comment: `시나몬 파우더 한 꼬집과 카카오 닙스입니다.\n시나몬 향이 요거트와 바나나 조합을 2배 고급스럽게 해주고,\n카카오 닙스가 오독오독 씹혀 식감을 채워줍니다.`
+    },
+    sekyung: {
+      text: `신세경 최애 들기름 메밀국수 꿀조합 비율 🥢\n\n쯔유 1T와 국산 들기름의 만남.\n\n메밀면 삶아 찬물에 헹구기.\n쯔유 1T + 들기름 2T 믹스.\n김가루와 깨를 아끼지 않고 팍팍.\n\n이것만 먹어도 평생 살 수 있을 것 같아요.\n\n근데 더 고소하게 먹을 수 있는\n황금 배합 소스 디테일이 숨어있어요.\n\n👉 댓글에 있습니다.`,
+      comment: `쯔유 1T와 국산 들기름 2T 외에\n'매실청 1/2t'를 섞어보세요.\n미세한 단맛이 돌며 감칠맛이 폭발합니다.\n참기름이 아닌 무조건 100% 들기름이어야 합니다.`
+    }
+  };
+
+  function applyTrend(key) {
+    const data = trendData[key];
+    if (!data) return;
+    
+    document.getElementById('post-text').value = data.text;
+    document.getElementById('post-comment').value = data.comment;
+    updateCharCount(document.getElementById('post-text'));
+    showToast('🔥 본문과 댓글을 입력창에 로드했습니다!');
+  }
+
+  /* ─── 페이지 전환 ─── */
+  function switchPage(page) {
+    ['publish','board'].forEach(p => {
+      document.getElementById(`page-${p}`).classList.toggle('active', p === page);
+      document.getElementById(`nav-${p}`).classList.toggle('active', p === page);
+    });
+    if (page === 'board') updateBoardCounts();
+  }
+
+  /* ─── 발행 모드 ─── */
+  let currentMode = 'instant';
+
+  function setMode(mode) {
+    currentMode = mode;
+    document.getElementById('btn-instant').classList.toggle('active', mode === 'instant');
+    document.getElementById('btn-schedule').classList.toggle('active', mode === 'schedule');
+    document.getElementById('schedule-section').classList.toggle('show', mode === 'schedule');
+    document.getElementById('publish-label').textContent =
+      mode === 'instant' ? '⚡ 즉시 발행' : '🕒 예약 등록';
+    if (mode === 'schedule') {
+      const dt = new Date(Date.now() + 60 * 60 * 1000);
+      document.getElementById('scheduled-at').value = toLocalDatetime(dt);
+    }
+  }
+
+  function toLocalDatetime(date) {
+    const pad = n => String(n).padStart(2,'0');
+    return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
+  function updateCharCount(el) {
+    const len = el.value.length;
+    const cc = document.getElementById('char-count');
+    cc.textContent = `${len} / 500`;
+    cc.classList.toggle('over', len > 500);
+  }
+
+  /* ─── 탭 전환 ─── */
+  function switchTab(tab) {
+    ['history','queue'].forEach(t => {
+      document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
+      document.getElementById(`panel-${t}`).classList.toggle('active', t === tab);
+    });
+    if (tab === 'queue') loadQueue();
+    if (tab === 'history') loadHistory();
+  }
+
+  /* ─── Toast ─── */
+  function showToast(msg, type = 'success') {
+    const el = document.getElementById('toast');
+    document.getElementById('toast-icon').textContent = type === 'success' ? '✅' : '❌';
+    document.getElementById('toast-msg').textContent = msg;
+    el.className = `show ${type}`;
+    setTimeout(() => el.className = '', 3500);
+  }
+
+  /* ─── 게시물 내용 맵 ─── */
+  const postTexts = {};
+  const postComments = {};
+
+  // 콘텐츠보드.md에 매칭되는 댓글 비법 맵핑 정보
+  const boardComments = {
+    "1-1": "포인트는 '냉동 바나나'입니다.\n신선 바나나보다 단맛이 2배예요.\n전날 밤에 얼려두면 돼요.\n이것만 바꿨는데 카페 스무디 맛이 났어요.",
+    "1-2": "저녁에 단백질 3가지를 먹으면 됩니다.\n닭가슴살 + 삶은 달걀 2개 + 두부 반 모.\n이걸 먹으면 9시까지 배가 안 고파요.\n소스는 올리브오일 + 소금 + 레몬즙만.",
+    "1-3": "타마린드 소스예요.\n태국 팟타이의 신맛이 여기서 나요.\n없으면 라임즙 + 설탕으로 대체할 수 있어요.\n그리고 면을 미리 찬물에 20분 불려야\n센불에 볶아도 안 끊겨요.",
+    "1-4": "치아씨드는 미리 불려야 해요.\n물에 30분 이상 담가두면 젤 상태가 돼요.\n그 상태에서 먹어야 소화가 되고 영양이 흡수돼요.\n그냥 먹으면 그대로 빠져나가는 경우가 많아요.",
+    "2-1": "두꺼운 식빵(2cm 이상)을 써야 해요.\n얇은 식빵은 달걀물을 못 버텨요.\n'풀먼 브레드' 또는 '하이브레드'가 딱 맞아요.\n편의점 삼립보다 베이커리 식빵이 훨씬 달라요.",
+    "2-2": "레몬즙 3~4방울입니다.\n마지막에 뿌리면 아보카도가 산화되지 않아요.\n색도 예쁘게 유지되고 맛도 훨씬 상큼해져요.\n카페에서 따로 알려주지 않는 팁이에요.",
+    "2-3": "단백질 함량 비교 (100g 기준):\n1위 오이코스: 단백질 17g\n2위 빙그레 그릭요거트: 10g\n3위 남양 그릭요거트: 8g\n\n다이어트 목적이면 오이코스가 압도적이에요.\n가격이 비싸지만 단백질이 2배라 가성비예요.",
+    "2-4": "슬라이스 치즈와 햄을 마른 팬에 아주 살짝 구워서 넣는 거예요.\n이것만 해도 풍미가 3배 올라가고 빵이 눅눅해지지 않습니다.",
+    "3-1": "우둔살 또는 홍두깨살을 고르세요.\n색이 선홍색인 것, 핏물이 없는 것.\n사자마자 당일 먹어야 해요.\n냉동 고기는 육회로 절대 안 됩니다.\n정육점에서 \"육회용으로 얇게 썰어주세요\" 부탁하세요.",
+    "3-2": "'면수'입니다.\n파스타 삶은 물 한 국자예요.\n소스에 넣으면 점성이 생겨요.\n치즈는 불 끄고 마지막에 넣어야 분리가 안 돼요.\n이 두 가지가 식당과 집밥의 차이입니다.",
+    "3-3": "절대 반죽하지 마세요.\n소금 + 후추를 뿌리고 '살짝' 뭉치기만 해요.\n반죽하면 글루텐이 생겨서 딱딱해져요.\n2cm 두께로 만들어서 센불에 앞뒤 2분씩.\n특제 소스: 마요 + 케첩 + 피클즙.",
+    "3-4": "멸치 + 다시마 육수예요.\n냄비에 물 1L + 멸치 10마리 + 다시마 1장.\n찬물부터 넣고 10분 끓인 다음 건져내세요.\n이 육수로 끓이면 아무 된장이나 써도 달라요.\n두부는 마지막 5분 전에 넣어야 안 부서져요.",
+    "4-1": "소스: 올리브오일 1T + 레몬즙 1T + 소금 + 꿀 반 스푼\n단맛이 살짝 있어야 샐러드를 끝까지 먹을 수 있어요.\n이걸로 저는 2주에 3kg 뺐습니다.",
+    "4-2": "쌈장을 빼야 해요.\n쌈장 1인분 기준 탄수화물이 밥 1/3 그릇이에요.\n대신 소금 + 참기름 + 깨에 찍어 먹으세요.\n칼로리가 1/5로 줄어요.\n이것만 바꿔도 저탄고지 효과가 확 납니다.",
+    "4-3": "떡 → 곤약떡으로 교체 (칼로리 1/3)\n어묵 → 새우+오징어로 교체 (단백질 UP)\n소스: 고추장 절반 + 토마토소스 절반.\n이렇게 하면 칼로리는 줄고 포만감은 올라가요.",
+    "4-4": "두부를 1cm 두께로 썰어요.\n키친타월로 물기를 꼭 짜세요. (이게 핵심)\n올리브오일 두른 팬에 앞뒤 2분씩 구워요.\n소금 + 후추 + 파슬리 가루.\n고기 없어도 포만감이 엄청나요.",
+    "5-1": "생크림을 휘핑하지 않고 그냥 넣으면 얼음처럼 굳어요.\n90% 정도 휘핑한 다음에 섞어야 부드러워요.\n그리고 오레오는 크림까지 같이 으깨야 더 맛있어요.",
+    "5-2": "팬에 기름을 아예 안 발라야 해요.\n기름이 있으면 머랭이 옆으로 퍼져요.\n팬을 키친타월로 완전히 닦은 뒤 사용하세요.\n그리고 뚜껑을 열 때 충격을 주면 바로 꺼져요.\n최대한 천천히 들어올리세요.",
+    "5-3": "마켓컬리 또는 쿠팡에서 '카다이프'로 검색하세요.\n없으면 쌀국수 면으로 대체 가능해요.\n팬에 버터로 바삭하게 볶은 다음 식혀야 해요.\n뜨거운 상태에서 초콜릿에 넣으면 녹아요.",
+    "5-4": "마늘기름을 먼저 충분히 내는 것이에요.\n파기름보다 마늘기름이 감칠맛을 내는 데 훨씬 뛰어납니다.",
+    "6-1": "복숭아 청 담그기예요.\n복숭아 1kg + 설탕 1kg + 유리병.\n껍질 벗기고 설탕에 재워서 냉장고 7일.\n탄산수에 타면 최고의 여름 음료가 됩니다.",
+    "6-2": "수박 피자예요.\n수박을 둥글게 썰고 리코타치즈를 얹어요.\n민트잎 + 꿀 + 발사믹 한 방울.\n달콤하고 상큼하고 시각적으로도 예쁩니다.\n인스타 올리면 저장이 폭발해요.",
+    "6-3": "오이소박이: 4등분 十자 칼집 내기\n오이 냉국: 어슷썰기 (0.3cm)\n오이 무침: 돌려깎기 후 얇게 채썰기\n\n오이는 소금에 절여서 물기를 꼭 짜야 해요.\n안 짜면 물이 나와서 맛이 싱거워져요.",
+    "6-4": "설탕 대신 올리고당을 30% 섞어 쓰면 수분이 훨씬 빠르게 빠져나오고 더욱 아삭해집니다.",
+    "7-1": "접시를 먼저 데워야 해요.\n차가운 접시에 음식을 담으면 10초 만에 식어요.\n식은 음식은 사진에서 표가 납니다.\n전자레인지 30초로 접시를 데운 뒤 담으세요.",
+    "7-2": "자연광을 먼저 잡으세요.\n창문을 등지지 말고, 옆에서 빛이 들어오게 하세요.\n형광등 아래서는 음식이 노랗게 나와요.\n오전 10시~오후 2시 사이가 가장 좋아요.\n핸드폰이어도 이 시간에 찍으면 달라요.",
+    "7-3": "공통점 3가지예요.\n1. 흰색 또는 무광 크림색\n2. 테두리가 있는 것 (테두리 안에 담으면 자연스러워요)\n3. 지름 25cm 이상\n\n다이소에서 '화이트 플레이트' 검색하면 있어요.\n6천원짜리가 카페 접시랑 거의 똑같아요.",
+    "7-4": "가장 메인이 되는 색상을 면적의 70% 잡고, 보색 대비가 되는 신선 채소를 10% 포인트로 얹어주면 보정 없이도 눈이 편안한 감성 사진이 찍힙니다."
+  };
+
+  document.querySelectorAll('.post-card').forEach(card => {
+    const id = card.id.replace('pc-','');
+    const text = card.querySelector('.post-text').textContent.trim();
+    postTexts[id] = text;
+    postComments[id] = boardComments[id] || "";
+    const ccEl = document.getElementById(`cc-${id}`);
+    if (ccEl) ccEl.textContent = `${text.length}자`;
+  });
+
+  /* ─── 복사 ─── */
+  function copyPost(id) {
+    const text = postTexts[id];
+    navigator.clipboard.writeText(text).then(() => showToast('클립보드에 복사되었습니다 📋'));
+  }
+
+  /* ─── 콘텐츠 보드에서 즉시 발행 ─── */
+  async function quickPublish(id) {
+    const text = postTexts[id];
+    const commentText = postComments[id];
+    const btn = document.querySelector(`#pc-${id} .btn-publish-now`);
+    btn.disabled = true;
+    btn.textContent = '...';
+
+    try {
+      const res = await fetch('/api/post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, commentText }),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error);
+
+      // 상태 업데이트
+      const statusEl = document.getElementById(`st-${id}`);
+      statusEl.className = 'post-status status-published';
+      statusEl.textContent = '✅ 발행됨';
+      document.getElementById(`pc-${id}`).classList.add('published');
+      btn.textContent = '완료';
+
+      showToast(`#${id} 본문 및 댓글(비법) 연쇄 발행 성공! 🎉`);
+      updateBoardCounts();
+      loadStats();
+    } catch (err) {
+      showToast(err.message, 'error');
+      btn.disabled = false;
+      btn.textContent = '발행';
+    }
+  }
+
+  /* ─── 보드 카운트 업데이트 ─── */
+  function updateBoardCounts() {
+    let totalPublished = 0;
+
+    for (let t = 1; t <= 7; t++) {
+      let count = 0;
+      for (let p = 1; p <= 4; p++) {
+        const st = document.getElementById(`st-${t}-${p}`);
+        if (st && st.classList.contains('status-published')) count++;
+      }
+      totalPublished += count;
+      const countEl = document.getElementById(`count-t${t}`);
+      if (countEl) countEl.textContent = `${count} / 4 발행`;
+    }
+
+    document.getElementById('board-published').textContent = totalPublished;
+    document.getElementById('board-remaining').textContent = 28 - totalPublished;
+
+    const pct = Math.round((totalPublished / 28) * 100);
+    document.getElementById('progress-pct').textContent = `${pct}%`;
+    document.getElementById('progress-bar').style.width = `${pct}%`;
+  }
+
+  /* ─── 즉시/예약 발행 ─── */
+  async function handlePublish() {
+    const text = document.getElementById('post-text').value.trim();
+    const commentText = document.getElementById('post-comment').value.trim();
+    const imageUrl = document.getElementById('image-url').value.trim();
+    const scheduledAt = document.getElementById('scheduled-at').value;
+
+    if (!text && !imageUrl) return showToast('텍스트 또는 이미지 URL을 입력해 주세요', 'error');
+    if (text.length > 500) return showToast('텍스트는 500자 이하로 입력해 주세요', 'error');
+
+    const btn = document.getElementById('publish-btn');
+    const spinner = document.getElementById('publish-spinner');
+    btn.disabled = true;
+    spinner.style.display = 'block';
+
+    try {
+      if (currentMode === 'instant') {
+        const res = await fetch('/api/post', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, imageUrl: imageUrl || undefined, commentText: commentText || undefined }),
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error);
+
+        showToast('✅ 본문 및 비댓글(답글) 발행 완료!');
+        loadHistory();
+        loadStats();
+      } else {
+        if (!scheduledAt) return showToast('예약 시간을 선택해 주세요', 'error');
+        const res = await fetch('/api/schedule', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text,
+            imageUrl: imageUrl || undefined,
+            commentText: commentText || undefined,
+            scheduledAt: new Date(scheduledAt).toISOString()
+          }),
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error);
+        showToast('🕒 예약 등록 완료!');
+        loadQueue();
+        loadStats();
+      }
+      document.getElementById('post-text').value = '';
+      document.getElementById('post-comment').value = '';
+      document.getElementById('image-url').value = '';
+      document.getElementById('char-count').textContent = '0 / 500';
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      spinner.style.display = 'none';
+    }
+  }
+
+  /* ─── 이력 ─── */
+  async function loadHistory() {
+    try {
+      const res = await fetch('/api/history');
+      const data = await res.json();
+      const list = document.getElementById('history-list');
+      if (!data.data?.length) { list.innerHTML = '<div class="empty">발행 이력이 없습니다</div>'; return; }
+      list.innerHTML = data.data.map(item => `
+        <div class="list-item">
+          <div class="list-item-icon ${item.type==='instant'?'icon-instant':'icon-published'}">
+            ${item.type==='instant'?'⚡':'🕒'}
+          </div>
+          <div class="list-item-body">
+            <div class="list-item-text">${escapeHtml(item.text||'(이미지)')}</div>
+            <div class="list-item-meta">
+              <span><span class="status-dot dot-published"></span>발행 완료</span>
+              <span>${formatTime(item.publishedAt)}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    } catch(e) { console.error(e); }
+  }
+
+  /* ─── 예약 큐 ─── */
+  async function loadQueue() {
+    try {
+      const res = await fetch('/api/queue');
+      const data = await res.json();
+      const list = document.getElementById('queue-list');
+      if (!data.data?.length) { list.innerHTML = '<div class="empty">예약된 게시물이 없습니다</div>'; return; }
+      list.innerHTML = data.data.map(item => `
+        <div class="list-item" id="q-${item.id}">
+          <div class="list-item-icon icon-pending">⏳</div>
+          <div class="list-item-body">
+            <div class="list-item-text">${escapeHtml(item.text||'(이미지)')}</div>
+            <div class="list-item-meta">
+              <span><span class="status-dot dot-pending"></span>예약 대기</span>
+              <span>📅 ${formatTime(item.scheduledAt)}</span>
+            </div>
+          </div>
+          <button class="btn btn-danger" onclick="cancelSchedule('${item.id}')">취소</button>
+        </div>
+      `).join('');
+    } catch(e) { console.error(e); }
+  }
+
+  async function cancelSchedule(id) {
+    if (!confirm('이 예약을 취소할까요?')) return;
+    try {
+      const res = await fetch(`/api/queue/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error);
+      showToast('예약이 취소되었습니다');
+      document.getElementById(`q-${id}`)?.remove();
+      loadStats();
+    } catch(err) { showToast(err.message, 'error'); }
+  }
+
+  /* ─── 계정 정보 ─── */
+  async function loadAccountInfo() {
+    try {
+      const res = await fetch('/api/me');
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error);
+      const me = data.data;
+      document.getElementById('account-chip').textContent = `@${me.username}`;
+      document.getElementById('status-badge').textContent = '● 연결됨';
+      document.getElementById('status-badge').style.color = '#34d399';
+      document.getElementById('account-info').innerHTML = `
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+          ${me.threads_profile_picture_url
+            ? `<img src="${me.threads_profile_picture_url}" style="width:52px;height:52px;border-radius:50%;object-fit:cover"/>`
+            : `<div style="width:52px;height:52px;border-radius:50%;background:var(--gradient)"></div>`}
+          <div>
+            <div style="font-weight:600">${me.name||me.username}</div>
+            <div style="font-size:0.8rem;color:var(--muted)">@${me.username}</div>
+          </div>
+        </div>
+        ${me.threads_biography?`<div style="font-size:0.83rem;color:var(--muted);line-height:1.6">${escapeHtml(me.threads_biography)}</div>`:''}
+        <div style="margin-top:12px;font-size:0.75rem;color:var(--muted)">ID: ${me.id}</div>
+      `;
+    } catch(err) {
+      document.getElementById('status-badge').textContent = '● 연결 오류';
+      document.getElementById('status-badge').style.color = '#f87171';
+      document.getElementById('account-info').innerHTML =
+        `<div class="empty" style="color:var(--danger)">API 연결 실패<br><small>${err.message}</small></div>`;
+    }
+  }
+
+  /* ─── 발행 한도 ─── */
+  async function loadLimit() {
+    try {
+      const res = await fetch('/api/limit');
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error);
+      const d = data.data?.data?.[0] || {};
+      const used = d.quota_usage ?? '–';
+      const max = d.config?.quota_total ?? 250;
+      const pct = max ? Math.round((used/max)*100) : 0;
+      document.getElementById('limit-info').innerHTML = `
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+          <span style="font-size:0.85rem">오늘 사용</span>
+          <span style="font-size:0.85rem;font-weight:600">${used} / ${max}회</span>
+        </div>
+        <div style="background:var(--surface2);border-radius:6px;height:8px;overflow:hidden">
+          <div style="width:${pct}%;height:100%;background:var(--gradient);border-radius:6px"></div>
+        </div>
+        <div style="font-size:0.75rem;color:var(--muted);margin-top:8px">잔여: ${max-used}회</div>
+      `;
+    } catch {
+      document.getElementById('limit-info').innerHTML =
+        '<div class="empty" style="font-size:0.8rem">한도 정보를 불러올 수 없습니다</div>';
+    }
+  }
+
+  /* ─── 통계 ─── */
+  async function loadStats() {
+    try {
+      const [hRes, qRes] = await Promise.all([fetch('/api/history'), fetch('/api/queue')]);
+      const hData = await hRes.json();
+      const qData = await qRes.json();
+      const history = hData.data || [];
+      const today = new Date().toDateString();
+      const todayCount = history.filter(h => new Date(h.publishedAt).toDateString() === today).length;
+      document.getElementById('stat-total').textContent = history.length;
+      document.getElementById('stat-today').textContent = todayCount;
+      document.getElementById('stat-queue').textContent = qData.data?.length || 0;
+    } catch {}
+  }
+
+  /* ─── 유틸 ─── */
+  function escapeHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function formatTime(iso) {
+    if (!iso) return '';
+    return new Date(iso).toLocaleString('ko-KR', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+  }
+
+  /* ─── 초기화 ─── */
+  (async () => {
+    await loadAccountInfo();
+    await Promise.all([loadHistory(), loadLimit(), loadStats()]);
+    setInterval(() => { loadHistory(); loadQueue(); loadStats(); loadLimit(); }, 30000);
+  })();
+</script>
+</body>
+</html>
