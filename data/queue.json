@@ -68,9 +68,10 @@
     "commentText": "복숭아 청 담그기예요.\n복숭아 1kg + 설탕 1kg + 유리병.\n껍질 벗기고 설탕에 재워서 냉장고 7일.\n탄산수에 타면 최고의 여름 음료가 됩니다.",
     "scheduledAt": "2026-07-06T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": false
+    "useCoupang": false,
+    "error": "Request failed with status code 400"
   },
   {
     "id": "auto-7-1-1783148714334",
