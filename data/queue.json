@@ -80,9 +80,10 @@
     "commentText": "접시를 먼저 데워야 해요.\n차가운 접시에 음식을 담으면 10초 만에 식어요.\n식은 음식은 사진에서 표가 납니다.\n전자레인지 30초로 접시를 데운 뒤 담으세요.",
     "scheduledAt": "2026-07-07T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": false
+    "useCoupang": false,
+    "error": "Request failed with status code 400"
   },
   {
     "id": "auto-3-2-1783148714334",
