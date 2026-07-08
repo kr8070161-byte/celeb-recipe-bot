@@ -92,9 +92,10 @@
     "commentText": "'면수'입니다.\n파스타 삶은 물 한 국자예요.\n소스에 넣으면 점성이 생겨요.\n치즈는 불 끄고 마지막에 넣어야 분리가 안 돼요.\n이 두 가지가 식당과 집밥의 차이입니다.",
     "scheduledAt": "2026-07-08T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": true
+    "useCoupang": true,
+    "error": "Request failed with status code 400"
   },
   {
     "id": "auto-1-2-1783148714334",
