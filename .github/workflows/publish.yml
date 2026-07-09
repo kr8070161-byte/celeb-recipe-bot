@@ -28,7 +28,7 @@ jobs:
         run: npm ci || npm install
 
       - name: Install Python dependencies
-        run: pip install requests Pillow
+        run: pip install requests Pillow google-generativeai python-dotenv
 
       - name: Pre-generate recipe card images
         run: node src/pre-generate.js
