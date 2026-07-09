@@ -15,10 +15,10 @@ if (!fs.existsSync(IMAGES_DIR)) {
 
 // 주제 및 식재료 맞춤형 고품질 이미지 맵
 const IMAGE_MAP = {
-  "스무디": "https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=800&q=80", // 스무디/아보카도
+  "스무디": "https://images.unsplash.com/photo-1574316071802-0d684efa7bf5?auto=format&fit=crop&w=800&q=80", // 그린 스무디
   "토스트": "https://images.unsplash.com/photo-1484723091739-30a097e8f929?auto=format&fit=crop&w=800&q=80", // 에그 토스트
   "샐러드": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80", // 샐러드
-  "오레오": "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?auto=format&fit=crop&w=800&q=80", // 오레오 아이스크림
+  "오레오": "https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=800&q=80", // 오레오 쿠키앤크림 아이스크림
   "복숭아": "https://images.unsplash.com/photo-1628824930689-53e7f603c4f2?auto=format&fit=crop&w=800&q=80", // 복숭아
   "플레이팅": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80", // 플레이팅/집밥
   "파스타": "https://images.unsplash.com/photo-1612874742237-6526221588e3?auto=format&fit=crop&w=800&q=80", // 크림파스타

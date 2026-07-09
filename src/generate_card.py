@@ -1,8 +1,14 @@
 import os
 import sys
+import json
 import requests
 from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
+import google.generativeai as genai
+import dotenv
+
+# Load local environment variables if present
+dotenv.load_dotenv()
 
 def wrap_text(text, font, max_width):
     words = text.split()
@@ -22,16 +28,85 @@ def wrap_text(text, font, max_width):
         lines.append(" ".join(current_line))
     return lines
 
+def parse_recipe_with_gemini(title, body_text):
+    """Uses Gemini to parse unstructured storytelling text into a clean recipe format."""
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        print("GEMINI_API_KEY not found in environment, falling back to basic parsing.")
+        return None
+        
+    try:
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel("gemini-2.5-flash")
+        
+        prompt = f"""
+        아래 요리 관련 글을 분석해서 카드뉴스 이미지에 들어갈 '핵심 요리 순서(Note) 3가지'와 '주요 재료(Ingredients)'를 한국어로 깔끔하게 추출해줘.
+        
+        글 제목: "{title}"
+        본문 내용:
+        "{body_text}"
+        
+        출력 형식은 반드시 아래 JSON 형식으로만 답해줘 (다른 설명 글 금지):
+        {{
+          "title": "요리 제목 (예: 오레오 아이스크림)",
+          "note": [
+            "1단계 설명 (25자 이내)",
+            "2단계 설명 (25자 이내)",
+            "3단계 설명 (25자 이내)"
+          ],
+          "ingredients": "재료 목록 (예: 오레오, 생크림, 크림치즈)"
+        }}
+        """
+        
+        response = model.generate_content(prompt)
+        response_text = response.text.strip()
+        
+        # Clean markdown code block wraps if present
+        if response_text.startswith("```"):
+            response_text = response_text.replace("```json", "").replace("```", "").strip()
+            
+        data = json.loads(response_text)
+        return data
+    except Exception as e:
+        print(f"Gemini recipe parsing failed: {e}")
+        return None
+
 def generate_card(title, body_text, bg_url, output_path):
-    print(f"Generating recipe card: {title} ...")
+    # 1. Try to parse clean recipe structure using Gemini
+    parsed_data = parse_recipe_with_gemini(title, body_text)
     
-    # 1. Download background food image
+    if parsed_data:
+        clean_title = parsed_data.get("title", title)
+        note_points = parsed_data.get("note", [])
+        ingredients_list = parsed_data.get("ingredients", "식재료")
+    else:
+        # Fallback to naive parsing if Gemini fails or is not configured
+        clean_title = title
+        # Clean title prefix
+        if "인기 레시피" in clean_title:
+            clean_title = clean_title.replace("인기 레시피", "").strip()
+            
+        paragraphs = [p.strip() for p in body_text.split("\n") if p.strip()]
+        note_points = []
+        for p in paragraphs:
+            if "1." in p or "2." in p or "3." in p or "✔" in p:
+                note_points.append(p.replace("1.", "").replace("2.", "").replace("3.", "").replace("✔", "").strip())
+        if not note_points:
+            note_points = ["재료 믹싱하기", "틀에 담기", "냉동고에 얼려주기"]
+            
+        ingredients_list = "오레오, 생크림, 크림치즈, 우유"
+        
+    print(f"Parsed Title: {clean_title}")
+    print(f"Parsed Notes: {note_points}")
+    print(f"Parsed Ingredients: {ingredients_list}")
+    
+    # 2. Download background food image
     try:
         r = requests.get(bg_url, timeout=10)
         food_img = Image.open(BytesIO(r.content))
     except Exception as e:
         print(f"Failed to download background, using default fallback: {e}")
-        food_img = Image.new("RGB", (600, 400), (220, 220, 220))
+        food_img = Image.new("RGB", (660, 420), (220, 220, 220))
         
     # Resize and crop food photo for center panel (660x420)
     food_img = food_img.resize((660, 420), Image.Resampling.LANCZOS)
@@ -77,73 +152,47 @@ def generate_card(title, body_text, bg_url, output_path):
         body_font = ImageFont.load_default()
         list_font = ImageFont.load_default()
         
-    # 2. Draw Outer Binder Border
+    # Draw Outer Binder Border
     draw.rectangle([30, 30, 970, 970], outline=(225, 215, 195), width=2)
     draw.rectangle([35, 35, 965, 965], outline=(180, 170, 150), width=1)
     
-    # 3. Draw Slanted Yellow Tape Tag at top-left
-    # Create separate RGBA layer for rotation
+    # Draw Slanted Yellow Tape Tag at top-left
     tape_layer = Image.new("RGBA", (1000, 1000), (0, 0, 0, 0))
     tape_draw = ImageDraw.Draw(tape_layer)
-    # Draw yellow tape
     tape_draw.rectangle([100, 55, 200, 90], fill=(245, 215, 80, 255))
-    # Write "NEW" inside tape
     tape_draw.text((125, 60), "NEW", font=tag_font, fill=(120, 90, 10))
-    # Rotate tape slightly to match example
     tape_rotated = tape_layer.rotate(6, resample=Image.Resampling.BICUBIC, center=(150, 72))
     card = Image.alpha_composite(card, tape_rotated)
     draw = ImageDraw.Draw(card)
     
-    # 4. Draw Main Title (Brown-Gold Bold)
-    title_color = (166, 98, 10) # Golden brown
-    title_w = title_font.getbbox(title)[2] - title_font.getbbox(title)[0]
-    draw.text(((1000 - title_w) // 2, 90), title, font=title_font, fill=title_color)
+    # Draw Main Title (Brown-Gold Bold)
+    title_color = (166, 98, 10)
+    title_w = title_font.getbbox(clean_title)[2] - title_font.getbbox(clean_title)[0]
+    draw.text(((1000 - title_w) // 2, 90), clean_title, font=title_font, fill=title_color)
     
-    # 5. Draw Polaroid Food Photo Frame in Center
+    # Draw Polaroid Food Photo Frame in Center
     photo_frame_box = [150, 170, 850, 610]
     draw.rectangle(photo_frame_box, fill=(255, 255, 255), outline=(215, 205, 185), width=2)
-    # Paste food image onto frame
     card.paste(food_img, (170, 180))
     
-    # Draw a small yellow/orange paper label clip on polaroid corner
+    # Draw orange label clip on polaroid corner
     clip_layer = Image.new("RGBA", (1000, 1000), (0, 0, 0, 0))
     clip_draw = ImageDraw.Draw(clip_layer)
-    clip_draw.rectangle([780, 520, 910, 560], fill=(238, 150, 75, 255)) # Orange-yellow label
+    clip_draw.rectangle([780, 520, 910, 560], fill=(238, 150, 75, 255))
     clip_draw.text((800, 528), "RECIPE", font=tag_font, fill=(255, 255, 255))
     clip_rotated = clip_layer.rotate(-10, resample=Image.Resampling.BICUBIC, center=(845, 540))
     card = Image.alpha_composite(card, clip_rotated)
     draw = ImageDraw.Draw(card)
     
-    # 6. Draw Bottom Section
+    # Draw Bottom Section
     # Draw "Note."
     draw.text((150, 635), "Note.", font=subtitle_font, fill=title_color)
-    # Underline below Note
     draw.line([150, 675, 850, 675], fill=(225, 215, 195), width=2)
     
-    # Split body into points
-    paragraphs = [p.strip() for p in body_text.split("\n") if p.strip()]
-    
-    # Filter 3 points for Note
-    note_points = []
-    ingredient_points = []
-    
-    for p in paragraphs:
-        # If paragraph mentions ingredients or is list of items, split
-        if "재료" in p or "준비" in p or "소스" in p or "Ingredient" in p:
-            ingredient_points.append(p)
-        elif len(note_points) < 3:
-            note_points.append(p)
-            
-    # Fallback if parsing didn't find specific ingredients
-    if not ingredient_points:
-        ingredient_points = ["오레오, 생크림, 크림치즈, 우유"]
-        
     # Draw Note Checkbox points
     y_cursor = 695
     for note in note_points[:3]:
-        # Custom orange checkmark
         draw.text((150, y_cursor), "✔", font=body_font, fill=(238, 150, 75))
-        # Wrap text line
         lines = wrap_text(note, body_font, 660)
         for line in lines:
             draw.text((185, y_cursor - 2), line, font=body_font, fill=(40, 40, 40))
@@ -156,11 +205,9 @@ def generate_card(title, body_text, bg_url, output_path):
     
     # Draw Ingredients list
     y_cursor += 45
-    ing_text = ", ".join(ingredient_points).replace("1.", "").replace("2.", "").replace("3.", "").replace("4.", "").strip()
-    # Limit length
-    if len(ing_text) > 80:
-        ing_text = ing_text[:80] + "..."
-    draw.text((150, y_cursor), ing_text, font=list_font, fill=(60, 60, 60))
+    if len(ingredients_list) > 80:
+        ingredients_list = ingredients_list[:80] + "..."
+    draw.text((150, y_cursor), ingredients_list, font=list_font, fill=(60, 60, 60))
     
     # Save Output
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
@@ -168,13 +215,20 @@ def generate_card(title, body_text, bg_url, output_path):
     print(f"Successfully generated notebook-style recipe card to {output_path}")
 
 if __name__ == "__main__":
-    if len(sys.argv) < 5:
-        print("Usage: python generate_card.py <title> <body> <bg_url> <output_path>")
-        sys.exit(1)
-        
-    title = sys.argv[1]
-    body = sys.argv[2]
-    bg_url = sys.argv[3]
-    output = sys.argv[4]
+    if len(sys.argv) == 2 and sys.argv[1].endswith('.json'):
+        with open(sys.argv[1], 'r', encoding='utf-8') as f:
+            args = json.load(f)
+        title = args['title']
+        body = args['body']
+        bg_url = args['bg_url']
+        output = args['output_path']
+    else:
+        if len(sys.argv) < 5:
+            print("Usage: python generate_card.py <title> <body> <bg_url> <output_path> OR python generate_card.py <args.json>")
+            sys.exit(1)
+        title = sys.argv[1]
+        body = sys.argv[2]
+        bg_url = sys.argv[3]
+        output = sys.argv[4]
     
     generate_card(title, body, bg_url, output)

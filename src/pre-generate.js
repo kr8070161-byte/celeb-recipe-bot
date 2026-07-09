@@ -1,16 +1,17 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
+const { uploadImage } = require('./uploader');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const QUEUE_FILE = path.join(DATA_DIR, 'queue.json');
 const IMAGES_DIR = path.join(__dirname, '..', 'public', 'generated-images');
 
 const IMAGE_MAP = {
-  "스무디": "https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=800&q=80",
+  "스무디": "https://images.unsplash.com/photo-1574316071802-0d684efa7bf5?auto=format&fit=crop&w=800&q=80", // 그린 스무디
   "토스트": "https://images.unsplash.com/photo-1484723091739-30a097e8f929?auto=format&fit=crop&w=800&q=80",
   "샐러드": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80",
-  "오레오": "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?auto=format&fit=crop&w=800&q=80",
+  "오레오": "https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=800&q=80", // 오레오 쿠키앤크림 아이스크림
   "복숭아": "https://images.unsplash.com/photo-1628824930689-53e7f603c4f2?auto=format&fit=crop&w=800&q=80",
   "플레이팅": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80",
   "파스타": "https://images.unsplash.com/photo-1612874742237-6526221588e3?auto=format&fit=crop&w=800&q=80",
@@ -27,6 +28,12 @@ const IMAGE_MAP = {
   "팟타이": "https://images.unsplash.com/photo-1626808642875-0aa5454f2fa8?auto=format&fit=crop&w=800&q=80",
   "삼겹살": "https://images.unsplash.com/photo-1601356616077-695728de17cb?auto=format&fit=crop&w=800&q=80",
   "된장찌개": "https://images.unsplash.com/photo-1608797178974-15b35a61d121?auto=format&fit=crop&w=800&q=80"
+};
+
+// 고유 포스트 키별 100% 매칭 고품질 이미지 맵
+const POST_KEY_IMAGE_MAP = {
+  "1-1": "https://images.unsplash.com/photo-1574316071802-0d684efa7bf5?auto=format&fit=crop&w=800&q=80", // 제니 아침 그린 스무디
+  "5-1": "https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=800&q=80", // 장원영 오레오 아이스크림
 };
 
 async function preGenerate() {
@@ -56,11 +63,28 @@ async function preGenerate() {
     let keyword = "요리";
     let bgUrl = "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80";
     
-    for (const kw of Object.keys(IMAGE_MAP)) {
-      if (item.text.includes(kw)) {
-        keyword = kw;
-        bgUrl = IMAGE_MAP[kw];
-        break;
+    // 1. 포스트 키(예: 1-1, 5-1 등) 기준 정밀 매칭 시도
+    const postKeyMatch = item.id.match(/^auto-(.+)-\d+$/);
+    const postKey = postKeyMatch ? postKeyMatch[1] : null;
+    
+    if (postKey && POST_KEY_IMAGE_MAP[postKey]) {
+      bgUrl = POST_KEY_IMAGE_MAP[postKey];
+      if (postKey === "1-1") {
+        keyword = "그린 스무디";
+      } else if (postKey === "5-1") {
+        keyword = "오레오";
+      } else {
+        keyword = postKey;
+      }
+      console.log(`[이미지 매칭] 포스트 키 정밀 매칭 성공 (키: "${postKey}") -> ${bgUrl}`);
+    } else {
+      // 2. 키워드 기반 매칭 (폴백)
+      for (const kw of Object.keys(IMAGE_MAP)) {
+        if (item.text.includes(kw)) {
+          keyword = kw;
+          bgUrl = IMAGE_MAP[kw];
+          break;
+        }
       }
     }
     
@@ -74,11 +98,23 @@ async function preGenerate() {
     
     try {
       console.log(`[이미지 선행 생성] 카드 생성 실행: ${title}`);
-      execSync(`python "${pythonScript}" "${title}" "${body}" "${bgUrl}" "${outputPath}"`);
+      const tempArgsPath = path.join(DATA_DIR, `temp-args-${item.id}.json`);
+      fs.writeFileSync(tempArgsPath, JSON.stringify({
+        title,
+        body,
+        bg_url: bgUrl,
+        output_path: outputPath
+      }, null, 2));
+
+      execSync(`python "${pythonScript}" "${tempArgsPath}"`);
       
-      const githubRawUrl = `https://raw.githubusercontent.com/kr8070161-byte/celeb-recipe-bot/main/public/generated-images/${filename}`;
-      item.imageUrl = githubRawUrl;
-      console.log(`[이미지 선행 생성] 생성 성공 -> ${githubRawUrl}`);
+      // 임시 파일 삭제
+      try { fs.unlinkSync(tempArgsPath); } catch (e) {}
+
+      // 생성된 이미지를 외부 호스팅에 업로드하여 공개 URL 획득
+      const publicUrl = await uploadImage(outputPath);
+      item.imageUrl = publicUrl;
+      console.log(`[이미지 선행 생성] 생성 및 업로드 성공 -> ${publicUrl}`);
     } catch (err) {
       console.error(`[이미지 선행 생성] ❌ 에러 발생:`, err.message);
     }
