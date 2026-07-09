@@ -56,9 +56,10 @@
     "commentText": "",
     "scheduledAt": "2026-07-05T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": false
+    "useCoupang": false,
+    "error": "Request failed with status code 400"
   },
   {
     "id": "auto-6-1-1783148714334",
@@ -67,9 +68,10 @@
     "commentText": "복숭아 청 담그기예요.\n복숭아 1kg + 설탕 1kg + 유리병.\n껍질 벗기고 설탕에 재워서 냉장고 7일.\n탄산수에 타면 최고의 여름 음료가 됩니다.",
     "scheduledAt": "2026-07-06T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": false
+    "useCoupang": false,
+    "error": "Request failed with status code 400"
   },
   {
     "id": "auto-7-1-1783148714334",
@@ -78,9 +80,10 @@
     "commentText": "접시를 먼저 데워야 해요.\n차가운 접시에 음식을 담으면 10초 만에 식어요.\n식은 음식은 사진에서 표가 납니다.\n전자레인지 30초로 접시를 데운 뒤 담으세요.",
     "scheduledAt": "2026-07-07T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": false
+    "useCoupang": false,
+    "error": "Request failed with status code 400"
   },
   {
     "id": "auto-3-2-1783148714334",
@@ -89,9 +92,10 @@
     "commentText": "'면수'입니다.\n파스타 삶은 물 한 국자예요.\n소스에 넣으면 점성이 생겨요.\n치즈는 불 끄고 마지막에 넣어야 분리가 안 돼요.\n이 두 가지가 식당과 집밥의 차이입니다.",
     "scheduledAt": "2026-07-08T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": true
+    "useCoupang": true,
+    "error": "Request failed with status code 400"
   },
   {
     "id": "auto-1-2-1783148714334",
@@ -100,9 +104,10 @@
     "commentText": "저녁에 단백질 3가지를 먹으면 됩니다.\n닭가슴살 + 삶은 달걀 2개 + 두부 반 모.\n이걸 먹으면 9시까지 배가 안 고파요.\n소스는 올리브오일 + 소금 + 레몬즙만.",
     "scheduledAt": "2026-07-09T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": false
+    "useCoupang": false,
+    "error": "Request failed with status code 400"
   },
   {
     "id": "auto-cta-2-1783148714334",
