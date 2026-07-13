@@ -152,9 +152,10 @@
     "commentText": "팬에 기름을 아예 안 발라야 해요.\n기름이 있으면 머랭이 옆으로 퍼져요.\n팬을 키친타월로 완전히 닦은 뒤 사용하세요.\n그리고 뚜껑을 열 때 충격을 주면 바로 꺼져요.\n최대한 천천히 들어올리세요.",
     "scheduledAt": "2026-07-13T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": false
+    "useCoupang": false,
+    "error": "Request failed with status code 400"
   },
   {
     "id": "auto-3-1-1783148714334",
