@@ -164,9 +164,10 @@
     "commentText": "우둔살 또는 홍두깨살을 고르세요.\n색이 선홍색인 것, 핏물이 없는 것.\n사자마자 당일 먹어야 해요.\n냉동 고기는 육회로 절대 안 됩니다.\n정육점에서 \"육회용으로 얇게 썰어주세요\" 부탁하세요.",
     "scheduledAt": "2026-07-14T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": false
+    "useCoupang": false,
+    "error": "Request failed with status code 400"
   },
   {
     "id": "auto-cta-3-1783148714334",
