@@ -56,9 +56,10 @@
     "commentText": "",
     "scheduledAt": "2026-07-05T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": false
+    "useCoupang": false,
+    "error": "Request failed with status code 400"
   },
   {
     "id": "auto-6-1-1783148714334",
@@ -67,9 +68,10 @@
     "commentText": "복숭아 청 담그기예요.\n복숭아 1kg + 설탕 1kg + 유리병.\n껍질 벗기고 설탕에 재워서 냉장고 7일.\n탄산수에 타면 최고의 여름 음료가 됩니다.",
     "scheduledAt": "2026-07-06T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": false
+    "useCoupang": false,
+    "error": "Request failed with status code 400"
   },
   {
     "id": "auto-7-1-1783148714334",
@@ -78,9 +80,10 @@
     "commentText": "접시를 먼저 데워야 해요.\n차가운 접시에 음식을 담으면 10초 만에 식어요.\n식은 음식은 사진에서 표가 납니다.\n전자레인지 30초로 접시를 데운 뒤 담으세요.",
     "scheduledAt": "2026-07-07T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": false
+    "useCoupang": false,
+    "error": "Request failed with status code 400"
   },
   {
     "id": "auto-3-2-1783148714334",
@@ -89,9 +92,10 @@
     "commentText": "'면수'입니다.\n파스타 삶은 물 한 국자예요.\n소스에 넣으면 점성이 생겨요.\n치즈는 불 끄고 마지막에 넣어야 분리가 안 돼요.\n이 두 가지가 식당과 집밥의 차이입니다.",
     "scheduledAt": "2026-07-08T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": true
+    "useCoupang": true,
+    "error": "Request failed with status code 400"
   },
   {
     "id": "auto-1-2-1783148714334",
@@ -100,9 +104,10 @@
     "commentText": "저녁에 단백질 3가지를 먹으면 됩니다.\n닭가슴살 + 삶은 달걀 2개 + 두부 반 모.\n이걸 먹으면 9시까지 배가 안 고파요.\n소스는 올리브오일 + 소금 + 레몬즙만.",
     "scheduledAt": "2026-07-09T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": false
+    "useCoupang": false,
+    "error": "Request failed with status code 400"
   },
   {
     "id": "auto-cta-2-1783148714334",
@@ -111,9 +116,10 @@
     "commentText": "",
     "scheduledAt": "2026-07-10T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": false
+    "useCoupang": false,
+    "error": "Request failed with status code 400"
   },
   {
     "id": "auto-4-3-1783148714334",
@@ -122,9 +128,10 @@
     "commentText": "떡 → 곤약떡으로 교체 (칼로리 1/3)\n어묵 → 새우+오징어로 교체 (단백질 UP)\n소스: 고추장 절반 + 토마토소스 절반.\n이렇게 하면 칼로리는 줄고 포만감은 올라가요.",
     "scheduledAt": "2026-07-11T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": false
+    "useCoupang": false,
+    "error": "Request failed with status code 400"
   },
   {
     "id": "auto-2-2-1783148714334",
@@ -133,9 +140,10 @@
     "commentText": "레몬즙 3~4방울입니다.\n마지막에 뿌리면 아보카도가 산화되지 않아요.\n색도 예쁘게 유지되고 맛도 훨씬 상큼해져요.\n카페에서 따로 알려주지 않는 팁이에요.",
     "scheduledAt": "2026-07-12T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": true
+    "useCoupang": true,
+    "error": "Request failed with status code 400"
   },
   {
     "id": "auto-5-2-1783148714334",
@@ -144,9 +152,10 @@
     "commentText": "팬에 기름을 아예 안 발라야 해요.\n기름이 있으면 머랭이 옆으로 퍼져요.\n팬을 키친타월로 완전히 닦은 뒤 사용하세요.\n그리고 뚜껑을 열 때 충격을 주면 바로 꺼져요.\n최대한 천천히 들어올리세요.",
     "scheduledAt": "2026-07-13T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": false
+    "useCoupang": false,
+    "error": "Request failed with status code 400"
   },
   {
     "id": "auto-3-1-1783148714334",
@@ -155,9 +164,10 @@
     "commentText": "우둔살 또는 홍두깨살을 고르세요.\n색이 선홍색인 것, 핏물이 없는 것.\n사자마자 당일 먹어야 해요.\n냉동 고기는 육회로 절대 안 됩니다.\n정육점에서 \"육회용으로 얇게 썰어주세요\" 부탁하세요.",
     "scheduledAt": "2026-07-14T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": false
+    "useCoupang": false,
+    "error": "Request failed with status code 400"
   },
   {
     "id": "auto-cta-3-1783148714334",
@@ -166,9 +176,10 @@
     "commentText": "",
     "scheduledAt": "2026-07-15T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": false
+    "useCoupang": false,
+    "error": "Request failed with status code 400"
   },
   {
     "id": "auto-6-2-1783148714334",
