@@ -75,11 +75,12 @@ async function run() {
 
       console.log(`[크론 발행] ✅ 발행 성공: postId=${result.postId}`);
     } catch (err) {
-      console.error(`[크론 발행] ❌ 발행 실패: ${item.id}`, err.message);
+      const errorDetail = err.response?.data ? JSON.stringify(err.response.data) : err.message;
+      console.error(`[크론 발행] ❌ 발행 실패: ${item.id}`, errorDetail);
       const allQueue = readQueue();
       const idx = allQueue.findIndex((q) => q.id === item.id);
       allQueue[idx].status = 'failed';
-      allQueue[idx].error = err.message;
+      allQueue[idx].error = errorDetail;
       writeQueue(allQueue);
     }
   }
