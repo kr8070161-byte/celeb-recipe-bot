@@ -111,9 +111,10 @@ async function preGenerate() {
       // 임시 파일 삭제
       try { fs.unlinkSync(tempArgsPath); } catch (e) {}
 
-      const githubRawUrl = `https://raw.githubusercontent.com/kr8070161-byte/celeb-recipe-bot/main/public/generated-images/${filename}`;
-      item.imageUrl = githubRawUrl;
-      console.log(`[이미지 선행 생성] 생성 성공 -> ${githubRawUrl}`);
+      console.log(`[이미지 선행 생성] uploader를 통한 이미지 업로드 시작...`);
+      const uploadedUrl = await uploadImage(outputPath);
+      item.imageUrl = uploadedUrl;
+      console.log(`[이미지 선행 생성] 생성 및 업로드 성공 -> ${uploadedUrl}`);
     } catch (err) {
       console.error(`[이미지 선행 생성] ❌ 에러 발생:`, err.message);
     }
