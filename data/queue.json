@@ -188,9 +188,10 @@
     "commentText": "수박 피자예요.\n수박을 둥글게 썰고 리코타치즈를 얹어요.\n민트잎 + 꿀 + 발사믹 한 방울.\n달콤하고 상큼하고 시각적으로도 예쁩니다.\n인스타 올리면 저장이 폭발해요.",
     "scheduledAt": "2026-07-16T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": false
+    "useCoupang": false,
+    "error": "{\"error\":{\"message\":\"API access blocked.\",\"type\":\"OAuthException\",\"code\":200,\"fbtrace_id\":\"AZQzNvRPujegbENAkND_vnf\"}}"
   },
   {
     "id": "auto-7-2-1783148714334",
