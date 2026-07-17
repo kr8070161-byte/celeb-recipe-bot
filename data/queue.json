@@ -200,9 +200,10 @@
     "commentText": "자연광을 먼저 잡으세요.\n창문을 등지지 말고, 옆에서 빛이 들어오게 하세요.\n형광등 아래서는 음식이 노랗게 나와요.\n오전 10시~오후 2시 사이가 가장 좋아요.\n핸드폰이어도 이 시간에 찍으면 달라요.",
     "scheduledAt": "2026-07-17T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": false
+    "useCoupang": false,
+    "error": "{\"error\":{\"message\":\"API access blocked.\",\"type\":\"OAuthException\",\"code\":200,\"fbtrace_id\":\"AAM1bECK1Aa4_ixWqDDuL5j\"}}"
   },
   {
     "id": "auto-1-4-1783148714334",
