@@ -212,9 +212,10 @@
     "commentText": "치아씨드는 미리 불려야 해요.\n물에 30분 이상 담가두면 젤 상태가 돼요.\n그 상태에서 먹어야 소화가 되고 영양이 흡수돼요.\n그냥 먹으면 그대로 빠져나가는 경우가 많아요.",
     "scheduledAt": "2026-07-17T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": true
+    "useCoupang": true,
+    "error": "{\"error\":{\"message\":\"API access blocked.\",\"type\":\"OAuthException\",\"code\":200,\"fbtrace_id\":\"AYXv_XmWv7-jpfVXTgRgFx7\"}}"
   },
   {
     "id": "auto-4-4-1783148714334",
