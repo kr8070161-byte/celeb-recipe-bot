@@ -236,9 +236,10 @@
     "commentText": "",
     "scheduledAt": "2026-07-20T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": false
+    "useCoupang": false,
+    "error": "{\"error\":{\"message\":\"API access blocked.\",\"type\":\"OAuthException\",\"code\":200,\"fbtrace_id\":\"ApqOCkDNXHLH_E5dk8fbMxR\"}}"
   },
   {
     "id": "auto-5-3-1783148714334",
