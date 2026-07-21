@@ -248,9 +248,10 @@
     "commentText": "마켓컬리 또는 쿠팡에서 '카다이프'로 검색하세요.\n없으면 쌀국수 면으로 대체 가능해요.\n팬에 버터로 바삭하게 볶은 다음 식혀야 해요.\n뜨거운 상태에서 초콜릿에 넣으면 녹아요.",
     "scheduledAt": "2026-07-21T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": false
+    "useCoupang": false,
+    "error": "{\"error\":{\"message\":\"API access blocked.\",\"type\":\"OAuthException\",\"code\":200,\"fbtrace_id\":\"APW5VQrH6FYD8yV5xEBxH6p\"}}"
   },
   {
     "id": "auto-3-3-1783148714334",
