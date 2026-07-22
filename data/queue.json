@@ -260,9 +260,10 @@
     "commentText": "절대 반죽하지 마세요.\n소금 + 후추를 뿌리고 '살짝' 뭉치기만 해요.\n반죽하면 글루텐이 생겨서 딱딱해져요.\n2cm 두께로 만들어서 센불에 앞뒤 2분씩.\n특제 소스: 마요 + 케첩 + 피클즙.",
     "scheduledAt": "2026-07-22T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": true
+    "useCoupang": true,
+    "error": "{\"error\":{\"message\":\"API access blocked.\",\"type\":\"OAuthException\",\"code\":200,\"fbtrace_id\":\"AVjvFHc-eDMdEH_qoS916vI\"}}"
   },
   {
     "id": "auto-6-3-1783148714334",
