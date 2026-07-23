@@ -272,9 +272,10 @@
     "commentText": "오이소박이: 4등분 十자 칼집 내기\n오이 냉국: 어슷썰기 (0.3cm)\n오이 무침: 돌려깎기 후 얇게 채썰기\n\n오이는 소금에 절여서 물기를 꼭 짜야 해요.\n안 짜면 물이 나와서 맛이 싱거워져요.",
     "scheduledAt": "2026-07-23T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": false
+    "useCoupang": false,
+    "error": "{\"error\":{\"message\":\"API access blocked.\",\"type\":\"OAuthException\",\"code\":200,\"fbtrace_id\":\"Afn0sA8YCuDkH61u8Z0WYC6\"}}"
   },
   {
     "id": "auto-2-3-1783148714334",
