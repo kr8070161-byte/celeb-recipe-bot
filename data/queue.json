@@ -284,9 +284,10 @@
     "commentText": "단백질 함량 비교 (100g 기준):\n1위 오이코스: 단백질 17g\n2위 빙그레 그릭요거트: 10g\n3위 남양 그릭요거트: 8g\n\n다이어트 목적이면 오이코스가 압도적이에요.\n가격이 비싸지만 단백질이 2배라 가성비예요.",
     "scheduledAt": "2026-07-24T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": false
+    "useCoupang": false,
+    "error": "{\"error\":{\"message\":\"API access blocked.\",\"type\":\"OAuthException\",\"code\":200,\"fbtrace_id\":\"A6G6WObm6vkEfsNNbKsfLuU\"}}"
   },
   {
     "id": "auto-cta-5-1783148714334",
