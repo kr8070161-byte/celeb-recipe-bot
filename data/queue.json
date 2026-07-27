@@ -320,9 +320,10 @@
     "commentText": "타마린드 소스예요.\n태국 팟타이의 신맛이 여기서 나요.\n없으면 라임즙 + 설탕으로 대체할 수 있어요.\n그리고 면을 미리 찬물에 20분 불려야\n센불에 볶아도 안 끊겨요.",
     "scheduledAt": "2026-07-27T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": true
+    "useCoupang": true,
+    "error": "{\"error\":{\"message\":\"API access blocked.\",\"type\":\"OAuthException\",\"code\":200,\"fbtrace_id\":\"A8_FfgRh73q3XCwlWMQUZEK\"}}"
   },
   {
     "id": "auto-4-2-1783148714334",
