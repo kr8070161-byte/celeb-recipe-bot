@@ -344,9 +344,10 @@
     "commentText": "멸치 + 다시마 육수예요.\n냄비에 물 1L + 멸치 10마리 + 다시마 1장.\n찬물부터 넣고 10분 끓인 다음 건져내세요.\n이 육수로 끓이면 아무 된장이나 써도 달라요.\n두부는 마지막 5분 전에 넣어야 안 부서져요.",
     "scheduledAt": "2026-07-29T10:00:00.000Z",
     "userId": "37812631128335506",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-07-04T07:05:14.331Z",
-    "useCoupang": true
+    "useCoupang": true,
+    "error": "{\"error\":{\"message\":\"API access blocked.\",\"type\":\"OAuthException\",\"code\":200,\"fbtrace_id\":\"AzVXCUm0Hu4UBVD4LKcKSdV\"}}"
   },
   {
     "id": "auto-cta-6-1783148714334",
